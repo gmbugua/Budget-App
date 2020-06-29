@@ -54,7 +54,7 @@ var BudgetController = (function () {
                     </div>
                 </div>
             `;
-      } else if (this.typ == "exp" && percent < 100) {
+      } else if (this.typ == "exp" && percent <= 100) {
         this.markUp = `
                 <div class="item clearfix" id="expense-${id}">
                     <div class="item__description">${this.desc}</div>
@@ -95,7 +95,6 @@ var BudgetController = (function () {
   function Report(name) {
     this.name = name;
     this.items = new Array(0);
-    this.itemPercent = new Array(0);
     this.rpTot = 0;
 
     // Adds the Item to the Report Items List
@@ -121,7 +120,6 @@ var BudgetController = (function () {
     this.setItemPercent = function (item) {
       var v = item.val;
       var p = round((v / this.rpTot) * 100, 0);
-      this.itemPercent.push(p);
       return p;
     };
 
@@ -138,18 +136,6 @@ var BudgetController = (function () {
 
       // remove target item from items list of report
       this.items.splice(i, 1);
-
-      // reset percents array
-      this.itemPercent.splice(i, 1);
-
-      // reset i
-      i = 0;
-
-      // re-calcualte all item percents
-      while (i < this.items.length) {
-        this.setItemPercent(this.items[i]);
-        i++;
-      }
     };
   }
 
@@ -166,6 +152,14 @@ var BudgetController = (function () {
     this.ExpPercent = 0;
 
     this.updateBudget = function () {
+      var i = 0;
+      while (i < this.ExpRp.items.length) {
+        var v = this.ExpRp.items[i].val;
+        var p = round((v / this.IncRp.rpTot) * 100, 0);
+        this.ExpRp.items[i].setItemMarkUp(this.ExpRp.items[i].id, p);
+        i++;
+      }
+
       this.BudgetTot = this.IncRp.rpTot + this.ExpRp.rpTot;
       this.NetIncome = this.IncRp.rpTot - this.ExpRp.rpTot;
 
