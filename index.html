@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,600"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link type="text/css" rel="stylesheet" href="style.css" />
+    <title>Budgety</title>
+  </head>
+
+  <body>
+    <!-- **********************************************
+    *** TOP PART
+    ********************************************** -->
+    <div class="top">
+      <div class="budget">
+        <!-- Need to update month based on current date data using Date() -->
+        <div class="budget__title">
+          Available Budget in <span class="budget__title--month">%Month%</span>:
+        </div>
+
+        <!-- The rest of these are placeholders that should be reset to 0 On Load -->
+        <div class="budget__value">+ 2,345.64</div>
+
+        <div class="budget__income clearfix">
+          <div class="budget__income--text">Income</div>
+
+          <div class="right">
+            <div class="budget__income--value">+ 4,300.00</div>
+            <div class="budget__income--percentage">&nbsp;</div>
+          </div>
+        </div>
+
+        <div class="budget__expenses clearfix">
+          <div class="budget__expenses--text">Expenses</div>
+
+          <div class="right clearfix">
+            <div class="budget__expenses--value">- 1,954.36</div>
+            <div class="budget__expenses--percentage">45%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- **********************************************
+    *** BOTTOM PART
+    ********************************************** -->
+
+    <div class="bottom">
+      <!-- add__container bkg  -->
+      <div class="add">
+        <!-- "add__container" Holds relevant fields/inputs to adding an income or expense to the ledger  -->
+        <div class="add__container">
+          <!-- dropdown, select + or - -->
+          <!-- + = income -->
+          <!-- - = expense  -->
+          <!-- default_value: "inc" -> + -->
+          <select class="add__type">
+            <option value="inc" selected>+</option>
+            <option value="exp">-</option>
+          </select>
+
+          <!-- desc_text: describes income or expense  -->
+          <input type="text" class="add__description" placeholder="Title" />
+
+          <!-- amnt of income to add to or expenses to subtract from the current global income -->
+          <input type="number" class="add__value" placeholder="Value" />
+
+          <!-- add__btn
+                    functions
+                    1. update net global income report
+                    2. update income/expense ledger based on dropdown selection (+ or -)
+                    3. update individual income and expenses report  -->
+          <button class="add__btn">
+            <i class="ion-ios-checkmark-outline"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="container clearfix" class="itemLists">
+        <div class="income">
+          <h2 class="income__title">Income</h2>
+
+          <div class="income__list"></div>
+        </div>
+
+        <div class="expenses">
+          <h2 class="expenses__title">Expenses</h2>
+
+          <div class="expenses__list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
