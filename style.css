@@ -24,8 +24,7 @@ body {
 
     display: grid;
     grid-template-rows: 50% 50%;
-    grid-template-areas: "top" 
-                        "bottom";
+    grid-template-areas: "top" "bottom";
 }
 
 .right { 
@@ -41,8 +40,8 @@ body {
 }
 
 /**********************************************
-*** TOP PART
-**********************************************/
+    TOP PART
+ **********************************************/
 
 .top {
     height: 47vh;
@@ -63,7 +62,7 @@ body {
 }
 
 .budget__title {
-    font-size: 24px;
+    font-size: 21px;
     text-align: center;
     margin-top: 30px;
     margin-bottom: 10px;
@@ -130,7 +129,7 @@ body {
 
 
 /**********************************************
-*** BOTTOM PART
+    BOTTOM PART
 **********************************************/
 
 .bottom {
@@ -217,8 +216,7 @@ body {
 .container {
     display: grid;
     grid-template-columns: 50% 50%;
-    grid-template-areas:
-    "income expenses";
+    grid-template-areas: "income expenses";
 }
 
 h2 {

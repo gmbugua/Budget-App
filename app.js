@@ -8,6 +8,12 @@ function thousands_separators(num) {
   return num_parts.join(".");
 }
 
+var nodeListForEach = function (list, callback) {
+  for (var i = 0; i < list.length; i++) {
+    callback(list[i], i);
+  }
+};
+
 // Budget Controller - IIFE Responsible for Budget Data Management
 var BudgetController = (function () {
   // **** PRIVATE ****
@@ -237,7 +243,7 @@ var UIController = (function (BudgetCtrl) {
 
     // Selects the Month by class and changes the text content based on the current month index
     document.querySelector(".budget__title--month").textContent =
-      months[date.getMonth()];
+      months[date.getMonth()] + " , " + date.getFullYear();
   }
 
   // Reset the DOM
