@@ -2,9 +2,9 @@
 Budget App built with pure JavaScript, HTML and CSS.
 
 ### Functionality
-Input any shorterm expeniditures and income to view whether or not your Monthly Budget is on track on a clean UI.
+Input shorterm expeniditures and income to view whether or not your Monthly Budget is on track on a clean UI.
 
-The color scheme: Blue, Red => indicates whether items are an Income or Expense. 
+The color scheme: Blue, Red; indicates whether items are an Income or Expense. 
 In other words, Blue => Income and Red => Expense. 
 
 Further, there are 3 Main figures displayed on the UI:
