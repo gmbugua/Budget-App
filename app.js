@@ -26,6 +26,14 @@ var BudgetController = (() => {
     return Number(Math.round(num + "e" + digits) + "e-" + digits);
   }
 
+  function calcPercent(largerNumber, smallerNumber) {
+    let p, c, d;
+    d = (largerNumber - smallerNumber) / largerNumber;
+    c = 1 - d;
+    p = round(c * 100, 0);
+    return p;
+  }
+
   // ITEM OBJECT DEFINITION
   // An Item is any  budget relevant financial information.
   // i.e. an expense such as a bill, or income like a tax return
@@ -144,9 +152,7 @@ var BudgetController = (() => {
     }
 
     updateItemPercent = (item) => {
-      let p, c, d;
-      d = (this.IncRp.rpTot - item.val) / this.IncRp.rpTot;
-      p = round((1 - d) * 100, 0);
+      let p = calcPercent(this.IncRp.rpTot, item.val);
       item.percent = p <= 100 ? `${p}%` : "Over Budget";
     };
 
@@ -161,10 +167,7 @@ var BudgetController = (() => {
       if (this.ExpRp.rpTot == 0) {
         this.ExpPercent = 0;
       } else {
-        let p, c, d;
-        d = (this.IncRp.rpTot - this.ExpRp.rpTot) / this.IncRp.rpTot;
-        c = 1 - d;
-        this.ExpPercent = round((1 - d) * 100, 0);
+        this.ExpPercent = calcPercent(this.IncRp.rpTot, this.ExpRp.rpTot);
       }
     };
   }
