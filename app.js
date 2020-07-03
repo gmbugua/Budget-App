@@ -146,13 +146,11 @@ var BudgetController = (() => {
     updateItemPercent = (item) => {
       let p, c, d;
       d = (this.IncRp.rpTot - item.val) / this.IncRp.rpTot;
-      c = 1 - d;
-      p = round(c * 100, 0);
+      p = round((1 - d) * 100, 0);
       item.percent = p <= 100 ? `${p}%` : "Over Budget";
     };
 
     updateBudget = () => {
-      this.BudgetTot = this.IncRp.rpTot + this.ExpRp.rpTot;
       this.NetIncome = this.IncRp.rpTot - this.ExpRp.rpTot;
 
       this.ExpRp.items.forEach((item) => {
@@ -163,8 +161,10 @@ var BudgetController = (() => {
       if (this.ExpRp.rpTot == 0) {
         this.ExpPercent = 0;
       } else {
-        this.IncPercent = round((this.IncRp.rpTot / this.BudgetTot) * 100, 0);
-        this.ExpPercent = round((this.ExpRp.rpTot / this.BudgetTot) * 100, 0);
+        let p, c, d;
+        d = (this.IncRp.rpTot - this.ExpRp.rpTot) / this.IncRp.rpTot;
+        c = 1 - d;
+        this.ExpPercent = round((1 - d) * 100, 0);
       }
     };
   }
