@@ -1,5 +1,5 @@
 # Budget-App
-Budget App built with pure JavaScript, HTML and CSS.
+Budget App built with pure JavaScript (Updated to ES6), HTML and CSS.
 
 ### Functionality
 Input shorterm expeniditures and income to view the status of your Monthly Budget on a straightforeward UI.
