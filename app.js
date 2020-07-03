@@ -8,14 +8,8 @@ function thousands_separators(num) {
   return num_parts.join(".");
 }
 
-var nodeListForEach = function (list, callback) {
-  for (var i = 0; i < list.length; i++) {
-    callback(list[i], i);
-  }
-};
-
 // Budget Controller - IIFE Responsible for Budget Data Management
-var BudgetController = (() => {
+let BudgetController = (() => {
   // **** PRIVATE ****
 
   // Rounds Numbers to a specified decimal place
@@ -185,7 +179,7 @@ var BudgetController = (() => {
   };
 })();
 
-var UIController = ((BudgetCtrl) => {
+let UIController = ((BudgetCtrl) => {
   // **** PRIVATE ****
 
   // DOMstrList holds the majoryity of class selectors used to manipulate the DOM
@@ -210,7 +204,7 @@ var UIController = ((BudgetCtrl) => {
 
   // Updates the budget month to current
   function setMonth() {
-    var date, months;
+    let date, months;
 
     date = new Date(); // Date Object -> getMonth() -> an integer in 0-11 -> Month Index
     months = [
@@ -251,23 +245,21 @@ var UIController = ((BudgetCtrl) => {
     // Calls SetMonth(), resetDOM()
     // PARAMETERS: NONE
     // RETURNS: NULL
-    initDOM: function () {
+    initDOM: () => {
       setMonth();
       resetDOM();
     },
 
     // PARAMETERS: NONE;
     // RETURNS: an instance of the  DOMstrList() Object
-    getDOMStrList: function () {
-      return new DOMStrList();
-    },
+    getDOMStrList: () => new DOMStrList(),
 
     // Resets user input fields on the DOM
     // Specifically, Description and Value Inputs
     // PARAMETERS: DOMlist --> instance of DOMstrList Object
     // RETURNS: NULL
-    rsetInputs: function (DOMlist) {
-      var fields, fieldsArr;
+    rsetInputs: (DOMlist) => {
+      let fields, fieldsArr;
 
       // returns a list of field elements and their value
       fields = document.querySelectorAll(
@@ -279,7 +271,7 @@ var UIController = ((BudgetCtrl) => {
 
       // loops over elements of the input
       // applies anonymous function to each one
-      fieldsArr.forEach(function (curr, index, arr) {
+      fieldsArr.forEach((curr) => {
         curr.value = "";
       });
 
@@ -291,16 +283,16 @@ var UIController = ((BudgetCtrl) => {
     // Creates an Item Object using user input
     // PARAMETERS: DOMlist --> instance of DOMstrList Object
     // RETURNS: Defined Item Object
-    getInputItem: function (DOMlist) {
+    getInputItem: (DOMlist) => {
       // INC or EXP
-      var t = document.querySelector(DOMlist.inType);
-      var type = t.options[t.selectedIndex].value;
+      let t = document.querySelector(DOMlist.inType);
+      let type = t.options[t.selectedIndex].value;
 
       // DESC
-      var desc = document.querySelector(DOMlist.inDesc).value;
+      let desc = document.querySelector(DOMlist.inDesc).value;
 
       // VALUE
-      var value = Number(document.querySelector(DOMlist.inValue).value);
+      let value = Number(document.querySelector(DOMlist.inValue).value);
 
       return BudgetCtrl.Item(desc, value, type);
     },
@@ -310,12 +302,13 @@ var UIController = ((BudgetCtrl) => {
     // then inserts the Item's html markup under it.
     // PARAMETERS: item --> instance of an Item Object
     // RETURNS: NULL
-    dispItemOnDOM: function (item) {
+    dispItemOnDOM: (item) => {
+      let el;
       if (item.typ == "exp") {
-        var el = document.getElementsByClassName("expenses__list")[0];
+        el = document.getElementsByClassName("expenses__list")[0];
         el.insertAdjacentHTML("beforeend", item.markUp);
       } else {
-        var el = document.getElementsByClassName("income__list")[0];
+        el = document.getElementsByClassName("income__list")[0];
         el.insertAdjacentHTML("beforeend", item.markUp);
       }
     },
@@ -323,7 +316,7 @@ var UIController = ((BudgetCtrl) => {
     // Displays Budget Data Structure Elements on DOM
     // PARAEMETERS: DOMlist
     // RETURNS: Budget
-    dispBudgetOnDom: function (DOMlist, Budget) {
+    dispBudgetOnDom: (DOMlist, Budget) => {
       if (Budget.NetIncome > 0) {
         document.querySelector(DOMlist.GlobalBudgetVal).textContent =
           "$ " + "+" + thousands_separators(Budget.NetIncome);
@@ -348,8 +341,8 @@ var UIController = ((BudgetCtrl) => {
           Budget.ExpPercent + "%";
       }
     },
-    removeItem: function (id) {
-      var parent, child;
+    removeItem: (id) => {
+      let parent, child;
       child = document.getElementById(id);
       parent = child.parentNode;
       parent.removeChild(child);
