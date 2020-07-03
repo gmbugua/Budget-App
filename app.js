@@ -15,7 +15,7 @@ var nodeListForEach = function (list, callback) {
 };
 
 // Budget Controller - IIFE Responsible for Budget Data Management
-var BudgetController = (function () {
+var BudgetController = (() => {
   // **** PRIVATE ****
 
   // Rounds Numbers to a specified decimal place
@@ -34,56 +34,44 @@ var BudgetController = (function () {
   // Item.val  --> the cash value of the item in Dollars
   // Item.typ  --> describes where the item should go when organizing the budget
   // * All parameters are user inputed through the DOM *
-  function Item(description, value, type) {
-    this.desc = description;
-    this.val = value;
-    this.typ = type;
+  class Item {
+    constructor(description, value, type) {
+      this.desc = description;
+      this.val = value;
+      this.typ = type;
 
-    this.setItemMarkUp = function (id, percent) {
       // Uses the Items Array Index as the ID for the Item
-      this.id = id;
-      this.percent = percent;
+      this.id = undefined;
+      this.percent = undefined;
+    }
 
+    setItemMarkUp = () => {
       // Assigns Proper HTML Markup to an Item
       // Based on Item Type
       if (this.typ == "inc") {
         this.markUp = `
-                <div class="item clearfix" id="income-${id}">
+                <div class="item clearfix" id="income-${this.id}">
                     <div class="item__description">${this.desc}</div>
                     <div class="right clearfix">
                         <div class="item__value">+ ${this.val}</div>
                         <div class="item__delete">
                             <button class="item__delete--btn" >
-                                <i class="ion-ios-close-outline" id="income-${id}"></i>
+                                <i class="ion-ios-close-outline"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `;
-      } else if (this.typ == "exp" && percent <= 100) {
+      } else if (this.typ == "exp") {
         this.markUp = `
-                <div class="item clearfix" id="expense-${id}">
+                <div class="item clearfix" id="expense-${this.id}">
                     <div class="item__description">${this.desc}</div>
                     <div class="right clearfix">
                         <div class="item__value">- ${this.val}</div>
-                        <div class="item__percentage">${this.percent}%</div>
+                        <div class="item__percentage">${this.percent}</div>
                         <div class="item__delete">
                             <button class="item__delete--btn">
-                                <i class="ion-ios-close-outline" id="expense-${id}"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-      } else {
-        this.markUp = `
-                <div class="item clearfix" id="expense-${id}">
-                    <div class="item__description">${this.desc}</div>
-                    <div class="right clearfix">
-                        <div class="item__value">- ${this.val}</div>
-                        <div class="item__delete">
-                            <button class="item__delete--btn">
-                                <i class="ion-ios-close-outline" id="expense-${id}"></i>
+                                <i class="ion-ios-close-outline"></i>
                             </button>
                         </div>
                     </div>
@@ -98,76 +86,79 @@ var BudgetController = (function () {
   // Report.name = name describing what type of items belong in it
   // Report.items = an array that holds items in sequential order of joining the Report
   // Report.repTot = the total value of the items in the report (dollar)
-  function Report(name) {
-    this.name = name;
-    this.items = new Array(0);
-    this.rpTot = 0;
+  class Report {
+    constructor(name) {
+      this.name = name;
+      this.items = new Array(0);
+      this.rpTot = 0;
+    }
+
+    updateItemID = (item) => {
+      this.items[this.items.indexOf(item)].id = this.items.indexOf(item);
+    };
 
     // Adds the Item to the Report Items List
     // Sets item syntax using the setItemMarkUp() function
     // Gives the item a unique id
     // PARAMETERS: instance of Item Object
     // RETURNS: NULL
-    this.addItem = function (item) {
+    addItem = (item) => {
       // Add item to the report's items array
       this.items.push(item);
+
+      this.updateItemID(item);
 
       // Update the value total of the report
       // i.o the reports total fraction of the budget
       this.rpTot += item.val;
 
       // Choose item HTML markup template based on Report
-      item.setItemMarkUp(this.items.indexOf(item), this.setItemPercent(item));
+      item.setItemMarkUp();
     };
 
-    // Calculates Item Percentage
-    // PARAMETERS: Item ---> Instance of an item
-    // RETURNS: NULL
-    this.setItemPercent = function (item) {
-      var v = item.val;
-      var p = round((v / this.rpTot) * 100, 0);
-      return p;
-    };
-
-    this.delReportItem = function (id) {
-      var i = 0;
-
-      // Find item of correct id, they are unsorted
-      while (id != this.items[i].id) {
-        i++;
+    // remove target item from items list of report
+    // if it exists
+    delReportItem = (item) => {
+      if (this.items.includes(item)) {
+        this.items.splice(item.id, 1);
       }
-
-      // update the rp total by subtracting target item's value
-      this.rpTot -= this.items[i].val;
-
-      // remove target item from items list of report
-      this.items.splice(i, 1);
+      this.items.forEeach((item) => {
+        this.updateItemID(item);
+        item.setItemMarkUp();
+      });
     };
   }
 
   // Income Expense Budget Object
   // PARAMETERS: Income Report , Expense Report
-  function IncomeExpenseBudget(IncReport, ExpReport) {
-    this.IncRp = IncReport;
-    this.ExpRp = ExpReport;
+  class IncomeExpenseBudget {
+    constructor(IncReport, ExpReport) {
+      this.IncRp = IncReport;
+      this.ExpRp = ExpReport;
 
-    this.BudgetTot = 0;
-    this.NetIncome = 0;
+      this.BudgetTot = 0;
+      this.NetIncome = 0;
 
-    this.IncPercent = 0;
-    this.ExpPercent = 0;
+      this.IncPercent = 0;
+      this.ExpPercent = 0;
+    }
 
-    this.updateBudget = function () {
-      var i = 0;
-      while (i < this.ExpRp.items.length) {
-        var v = this.ExpRp.items[i].val;
-        var p = round((v / this.IncRp.rpTot) * 100, 0);
-        this.ExpRp.items[i].setItemMarkUp(this.ExpRp.items[i].id, p);
-        i++;
-      }
+    updateItemPercent = (item) => {
+      let p, c, d;
+      d = (this.IncRp.rpTot - item.val) / this.IncRp.rpTot;
+      c = 1 - d;
+      p = round(c * 100, 0);
+      item.percent = p <= 100 ? `${p}%` : "Over Budget";
+    };
 
+    updateBudget = () => {
       this.BudgetTot = this.IncRp.rpTot + this.ExpRp.rpTot;
       this.NetIncome = this.IncRp.rpTot - this.ExpRp.rpTot;
+
+      this.ExpRp.items.forEach((item) => {
+        this.updateItemPercent(item);
+        item.setItemMarkUp();
+      });
 
       if (this.ExpRp.rpTot == 0) {
         this.ExpPercent = 0;
@@ -184,21 +175,14 @@ var BudgetController = (function () {
     // To be accessed publicly by the other Modules
     // PARAMETERS: Arguments of returned object construture
     // RETURN: A private Object Constructure
-    Report: function (name) {
-      return new Report(name);
-    },
-
-    Item: function (description, value, type) {
-      return new Item(description, value, type);
-    },
-
-    IncomeExpenseBudget: function (IncReport, ExpReport) {
-      return new IncomeExpenseBudget(IncReport, ExpReport);
-    },
+    Report: (name) => new Report(name),
+    Item: (description, value, type) => new Item(description, value, type),
+    IncomeExpenseBudget: (IncReport, ExpReport) =>
+      new IncomeExpenseBudget(IncReport, ExpReport),
   };
 })();
 
-var UIController = (function (BudgetCtrl) {
+var UIController = ((BudgetCtrl) => {
   // **** PRIVATE ****
 
   // DOMstrList holds the majoryity of class selectors used to manipulate the DOM
@@ -370,7 +354,7 @@ var UIController = (function (BudgetCtrl) {
   };
 })(BudgetController);
 
-var AppController = (function (UIctrl, BudgetCtrl) {
+var AppController = ((UIctrl, BudgetCtrl) => {
   // **** PRIVATE ****
 
   // REPORTS
@@ -422,7 +406,6 @@ var AppController = (function (UIctrl, BudgetCtrl) {
 
   var delItemFromDOM = function (event) {
     var elmInfo = event.target.parentNode.tagName;
-
     if (elmInfo == "BUTTON") {
       var elmID = event.target.id;
       var t = event.target.id.split("-");
@@ -434,10 +417,10 @@ var AppController = (function (UIctrl, BudgetCtrl) {
         GlobalBudget.ExpRp.delReportItem(parseInt(t[1]));
       }
 
-      UIctrl.removeItem(elmID);
-      GlobalBudget.updateBudget();
-      UIctrl.dispBudgetOnDom(DOMstr, GlobalBudget);
-      UIctrl.rsetInputs(DOMstr);
+      // UIctrl.removeItem(elmID);
+      // GlobalBudget.updateBudget();
+      // UIctrl.dispBudgetOnDom(DOMstr, GlobalBudget);
+      // UIctrl.rsetInputs(DOMstr);
     }
   };
 
