@@ -104,14 +104,13 @@ let BudgetController = (() => {
       this.rpTot = 0;
     }
 
-    updateItemID = (item) => {
-      this.items[this.items.indexOf(item)].setItemID(this.items.indexOf(item));
+    setItemID = (item) => {
+      const itemIndex = this.items.indexOf(item);
+      this.items[itemIndex].setItemID(itemIndex);
     };
 
-    updateItemsID = () => {
-      this.items.forEach((item) => {
-        this.updateItemID(item);
-      });
+    findItemIndex = (id) => {
+      return this.items.findIndex((item) => item.id == id);
     };
 
     // Adds the Item to the Report Items List
@@ -123,7 +122,7 @@ let BudgetController = (() => {
       // Add item to the report's items array
       this.items.push(item);
 
-      this.updateItemID(item);
+      this.setItemID(item);
 
       // Update the value total of the report
       // i.o the reports total fraction of the budget
@@ -136,9 +135,9 @@ let BudgetController = (() => {
     // remove target item from items list of report
     // if it exists
     delReportItem = (id) => {
-      this.rpTot -= this.items[id].val;
-      this.items.splice(id, 1);
-      this.updateItemsID();
+      const index = this.findItemIndex(id);
+      this.rpTot -= this.items[index].val;
+      this.items.splice(index, 1);
     };
   }
 
