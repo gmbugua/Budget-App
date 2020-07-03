@@ -45,7 +45,16 @@ let BudgetController = (() => {
       // Uses the Items Array Index as the ID for the Item
       this.id = undefined;
       this.percent = undefined;
+      this.markUp = undefined;
     }
+
+    setItemID = (id) => {
+      this.id = id;
+    };
+
+    setItemPercent = (percent) => {
+      this.percent = percent;
+    };
 
     setItemMarkUp = () => {
       // Assigns Proper HTML Markup to an Item
@@ -57,14 +66,14 @@ let BudgetController = (() => {
                     <div class="right clearfix">
                         <div class="item__value">+ ${this.val}</div>
                         <div class="item__delete">
-                            <button class="item__delete--btn" >
+                            <button class="item__delete--btn" id="income-${this.id}">
                                 <i class="ion-ios-close-outline"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `;
-      } else if (this.typ == "exp") {
+      } else {
         this.markUp = `
                 <div class="item clearfix" id="expense-${this.id}">
                     <div class="item__description">${this.desc}</div>
@@ -72,7 +81,7 @@ let BudgetController = (() => {
                         <div class="item__value">- ${this.val}</div>
                         <div class="item__percentage">${this.percent}</div>
                         <div class="item__delete">
-                            <button class="item__delete--btn">
+                            <button class="item__delete--btn" id="expense-${this.id}">
                                 <i class="ion-ios-close-outline"></i>
                             </button>
                         </div>
@@ -96,7 +105,13 @@ let BudgetController = (() => {
     }
 
     updateItemID = (item) => {
-      this.items[this.items.indexOf(item)].id = this.items.indexOf(item);
+      this.items[this.items.indexOf(item)].setItemID(this.items.indexOf(item));
+    };
+
+    updateItemsID = () => {
+      this.items.forEach((item) => {
+        this.updateItemID(item);
+      });
     };
 
     // Adds the Item to the Report Items List
@@ -120,14 +135,10 @@ let BudgetController = (() => {
 
     // remove target item from items list of report
     // if it exists
-    delReportItem = (item) => {
-      if (this.items.includes(item)) {
-        this.items.splice(item.id, 1);
-      }
-      this.items.forEeach((item) => {
-        this.updateItemID(item);
-        item.setItemMarkUp();
-      });
+    delReportItem = (id) => {
+      this.rpTot -= this.items[id].val;
+      this.items.splice(id, 1);
+      this.updateItemsID();
     };
   }
 
@@ -145,18 +156,16 @@ let BudgetController = (() => {
       this.ExpPercent = 0;
     }
 
-    updateItemPercent = (item) => {
+    updateItemPercent = function (item) {
       let p = calcPercent(this.IncRp.rpTot, item.val);
       item.percent = p <= 100 ? `${p}%` : "Over Budget";
+      item.setItemMarkUp();
     };
 
     updateBudget = () => {
       this.NetIncome = this.IncRp.rpTot - this.ExpRp.rpTot;
 
-      this.ExpRp.items.forEach((item) => {
-        this.updateItemPercent(item);
-        item.setItemMarkUp();
-      });
+      this.ExpRp.items.forEach((item) => this.updateItemPercent(item));
 
       if (this.ExpRp.rpTot == 0) {
         this.ExpPercent = 0;
@@ -285,14 +294,14 @@ let UIController = ((BudgetCtrl) => {
     // RETURNS: Defined Item Object
     getInputItem: (DOMlist) => {
       // INC or EXP
-      let t = document.querySelector(DOMlist.inType);
-      let type = t.options[t.selectedIndex].value;
+      var t = document.querySelector(DOMlist.inType);
+      var type = t.options[t.selectedIndex].value;
 
       // DESC
-      let desc = document.querySelector(DOMlist.inDesc).value;
+      var desc = document.querySelector(DOMlist.inDesc).value;
 
       // VALUE
-      let value = Number(document.querySelector(DOMlist.inValue).value);
+      var value = parseInt(document.querySelector(DOMlist.inValue).value);
 
       return BudgetCtrl.Item(desc, value, type);
     },
@@ -303,7 +312,7 @@ let UIController = ((BudgetCtrl) => {
     // PARAMETERS: item --> instance of an Item Object
     // RETURNS: NULL
     dispItemOnDOM: (item) => {
-      let el;
+      var el;
       if (item.typ == "exp") {
         el = document.getElementsByClassName("expenses__list")[0];
         el.insertAdjacentHTML("beforeend", item.markUp);
@@ -353,13 +362,13 @@ let UIController = ((BudgetCtrl) => {
 var AppController = ((UIctrl, BudgetCtrl) => {
   // **** PRIVATE ****
 
+  const DOMstr = UIctrl.getDOMStrList();
+
   // REPORTS
-  var GlobalBudget = BudgetCtrl.IncomeExpenseBudget(
+  let GlobalBudget = BudgetCtrl.IncomeExpenseBudget(
     BudgetCtrl.Report("Income"),
     BudgetCtrl.Report("Expense")
   );
-
-  var DOMstr = UIctrl.getDOMStrList();
 
   // Sets up our Event Listeners
   // Used during Initialization
@@ -379,6 +388,12 @@ var AppController = ((UIctrl, BudgetCtrl) => {
       .addEventListener("click", delItemFromDOM);
   }
 
+  function appUpdate() {
+    // UPDATE DOM INFORMATION AND BUDGET
+    UIctrl.dispBudgetOnDom(DOMstr, GlobalBudget);
+    UIctrl.rsetInputs(DOMstr);
+  }
+
   // Adds items to respective report and updates the DOM
   // PARAMETERS: NONE
   // RETURNS: NULL
@@ -394,17 +409,18 @@ var AppController = ((UIctrl, BudgetCtrl) => {
 
       // UPDATE DOM INFORMATION AND BUDGET
       GlobalBudget.updateBudget();
-      UIctrl.dispBudgetOnDom(DOMstr, GlobalBudget);
       UIctrl.dispItemOnDOM(item);
-      UIctrl.rsetInputs(DOMstr);
+      appUpdate();
     }
   }
 
-  var delItemFromDOM = function (event) {
-    var elmInfo = event.target.parentNode.tagName;
+  var delItemFromDOM = (event) => {
+    let parentTarget = event.target.parentNode;
+    let elmInfo = event.target.parentNode.tagName;
+
     if (elmInfo == "BUTTON") {
-      var elmID = event.target.id;
-      var t = event.target.id.split("-");
+      let elmID = parentTarget.id;
+      let t = elmID.split("-");
 
       // delete item from data structure if it exists
       if (t[0] == "income") {
@@ -413,10 +429,9 @@ var AppController = ((UIctrl, BudgetCtrl) => {
         GlobalBudget.ExpRp.delReportItem(parseInt(t[1]));
       }
 
-      // UIctrl.removeItem(elmID);
-      // GlobalBudget.updateBudget();
-      // UIctrl.dispBudgetOnDom(DOMstr, GlobalBudget);
-      // UIctrl.rsetInputs(DOMstr);
+      UIctrl.removeItem(elmID);
+      GlobalBudget.updateBudget();
+      appUpdate();
     }
   };
 
